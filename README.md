@@ -8,7 +8,7 @@ Express.js est un framework JavaScript minimaliste pour Node.js, facilitant la c
 
 Une API REST (Representational State Transfer) est une interface qui permet à des systèmes informatiques différents de communiquer entre eux de manière standardisée via le protocole HTTP. Elle repose sur des principes simples, comme l'utilisation d'URIs pour identifier les ressources, l'utilisation des méthodes HTTP (GET, POST, PUT, DELETE) pour effectuer des opérations sur ces ressources, et la représentation des données en formats courants comme JSON ou XML. L'approche REST favorise la simplicité, l'extensibilité et l'indépendance entre le client et le serveur.
 
-## Créer un nouveau projet Express.js (Hello World)
+## Créer un nouveau projet Express.js basique :
 Tout d'abord, créez un dossier appelé express_workshop et initialisez npm :
 ```
 mkdir express_workshop 
@@ -70,4 +70,17 @@ app.get("/", (req, res) => {
     res.send("Hello World!");
     console.log("Hello World!");
 });
+```
+## Ajouter des meilleures pratiques de l'api/backend :
+Voici une bonne structure pour un projet express :
+```
+src/
+├── config/ 
+├── controllers/
+├── middlewares/
+├── models/
+├── dto/
+├── routes/
+└── sockets/
+└── test/
 ```
