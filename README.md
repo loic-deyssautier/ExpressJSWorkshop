@@ -193,9 +193,55 @@ module.exports = {
     helloWorldGet
 };
 ```
-Pour tester les requête, utiliser Postman
+Pour tester les requêtes, utiliser Postman
 
 ## Ajout de l'authentification :
+Pour ajouter l'authentification nous allons rajouter le schéma de l'user.</br>
+Créer un fichier User.js dans le dossier models
+```
+const mongoose = require('mongoose');
+
+const userSchema = new mongoose.Schema(
+  {
+    username: {
+      type: String,
+      required: true,
+      unique: true
+    },
+    password: {
+      type: String,
+      required: true,
+      unique: false
+    }
+  },
+  { timestamps: true }
+);
+
+const User = mongoose.model('User', userSchema);
+
+module.exports = User;
+```
+Rajouter le paquet bcrypt pour hasher le mots de pass :
+```
+npm i bcrypt
+```
+Toujours dans le fichier User.js rajouter le code pour hashé le mots de passe et pour comparer une string au mots de passe .
+```
+const bcrypt = require('bcrypt');
+
+userSchema.pre('save', async function (next) {
+  # hashé le mots de passe ici
+});
+
+userSchema.methods.comparePassword = async function (password) {
+  # comparer une string au mots de passe
+};
+```
+Pour gérer le token d'authentification nous allons utiliser jwt
+```
+npm i jwt
+```
+
 
 ### models :
 
