@@ -23,10 +23,12 @@ Ajoutez le paquet Nodemon pour exécuter l'application sans redémarrer le serve
 ```
 npm install nodemon
 ```
+Si vous avez node 18 ou plus d'installer vous pouvez utliser le --watch a la place de nodemon
+
 Modifier package.json et ajouter le commande nodemon :
 ```
 "scripts": {
-    "start": "nodemon index.js"
+    "start": "nodemon server.js"
 },
 ```
 Ajouter aussi body-parser et cors
@@ -35,7 +37,7 @@ npm install body-parser
 npm install cors
 ```
 
-Créer un fichier index.js et importer dedans express ainsi que l'initialisation du serveur :
+Créer un fichier server.js et importer dedans express ainsi que l'initialisation du serveur :
 ```
 const express = require('express');
 
@@ -51,11 +53,11 @@ Créer un fichier .env et ajouter dedans le port sur lequel le serveur va tourne
 ```
 PORT=5000
 ```
-dans le fichier index.js rajouter l'import de dotenv :
+dans le fichier server.js rajouter l'import de dotenv :
 ```
 dotenv.config();
 ```
-Toujour dans le fichier index.js rajouter une constante pour le port du serveur :
+Toujour dans le fichier server.js rajouter une constante pour le port du serveur :
 ```
 const PORT = process.env.PORT || 3000;
 ```
@@ -161,7 +163,7 @@ const router = express.Router();
 
 module.exports = router;
 ```
-Dans le index.js a la racine du projet importer le router et ajouter en dessous de la requête get / :
+Dans le server.js a la racine du projet importer le router et ajouter en dessous de la requête get / :
 ```
 app.use('', routes);
 ```
@@ -241,15 +243,112 @@ Pour gérer le token d'authentification nous allons utiliser jwt
 ```
 npm i jwt
 ```
+Nous allons maintenant créer la requête d'authentification, créer un fichier  auth.js dans le dossier controllers/ et compléter le code suivant :
+```
+const jwt = require('jsonwebtoken');
+const bcrypt = require('bcrypt');
+const User = require('../models/User');
 
+const register = async (req, res, next) => {
+  var { username, password } = req.body;
 
-### models :
+  try {
+    ...
 
-### jwt :
+    await user.save();
+    ...
+  } catch (error) {
+    ...
+  }
+};
 
-### dto :
+const login = async (req, res, next) => {
+  const { username, password } = req.body;
 
-## Ajout d'image :
-### Setup de Cloodinary
-### Setup de multer
-## Ajout de Swagger :
+  try {
+    ...
+
+    const token = jwt.sign({ userId: user._id }, process.env.SECRET_KEY, {
+      expiresIn: '15d'
+    });
+    ...
+  } catch (error) {
+    ...
+  }
+};
+
+const logout = async (req, res, next) => {
+
+  try {
+    ...
+  } catch (error) {
+    ...
+  }
+};
+
+module.exports = { register, login, logout };
+```
+N'oublier pas d'importer les requête dans le dossier route.js
+```
+
+const { register, login, logout } = require('../controllers/auth');
+
+router.post('/auth/signup', register);
+router.post('/auth/login', login);
+router.post('/auth/logout', logout);
+```
+
+Maintenant il ne reste plus qu'a créer un middleware pour la gestion du token d'authentification qui va permettre de protéger certaine requête :
+
+Créer un dans le dossier middlewares auth.js :
+```
+const jwt = require('jsonwebtoken');
+const User = require('../models/User');
+
+const authenticate = async (req, res, next) => {
+  const token = req.headers.authorization?.split(' ')[1];
+
+  if (!token) {
+    return res.status(401).json({ message: 'Authentication required' });
+  }
+
+  try {
+    const decodedToken = jwt.verify(token, process.env.SECRET_KEY);
+    const user = await User.findById(decodedToken.userId);
+    if (!user) {
+      return res.status(404).json({ message: 'User not found' });
+    }
+
+    req.user = user;
+    next();
+  } catch (error) {
+    res.status(401).json({ message: 'Invalid token' });
+  }
+};
+
+module.exports = { authenticate };
+```
+
+Pour protéger un requête il suffit de rajouter dans routes/index.js [authenticate] a chaque requête protégé :
+```
+const { authenticate } = require('../middlewares/auth');
+
+router.get('/helloworld', [authenticate], helloWorldGet);
+```
+
+Essayer de créer une requête profile get pour obtenir le information d'un user
+
+Voici un peut d'aide obtenir pour obtenir un user dans le db d'après un id :
+```
+const { _id } = req.user;
+...
+const user = await User.findById(_id);
+...
+
+```
+- Essayer de créer une requête supprimer un user
+- Essayer de créer une requête obtenir la listes des user
+- Essayer de créer une requête pour modifier les info d'un user 
+- Rajouter plus d'information dans le schéma de l'user
+- Créer un nouveau schéma pour un système de messages en groupe
+
