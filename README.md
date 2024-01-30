@@ -1,43 +1,53 @@
 # ExpressJSWorkshop
 
-## Qu'est ce qu'Express.js
+## What is Express.js?
 
-Express.js est un framework JavaScript minimaliste pour Node.js, facilitant la création d'applications backend. Son objectif principal est de simplifier le développement en fournissant des fonctionnalités basiques pour la gestion des routes, des requêtes HTTP, des paramètres, des réponses, et des middlewares. Express est souvent utilisé pour construire des backends API RESTful, offrant ainsi une base solide et flexible pour la création d'applications web avec Node.js.
+Express.js is a minimalist JavaScript framework for Node.js, making it easy to create backend applications. Its main aim is to simplify development by providing basic functionality for managing routes, HTTP requests, parameters, responses and middleware. Express is often used to build RESTful API backends, providing a solid and flexible foundation for building web applications with NodeJS.
 
-## Qu'est ce qu'une Api RESTful
+## What is a RESTful Api?
 
-Une API REST (Representational State Transfer) est une interface qui permet à des systèmes informatiques différents de communiquer entre eux de manière standardisée via le protocole HTTP. Elle repose sur des principes simples, comme l'utilisation d'URIs pour identifier les ressources, l'utilisation des méthodes HTTP (GET, POST, PUT, DELETE) pour effectuer des opérations sur ces ressources, et la représentation des données en formats courants comme JSON ou XML. L'approche REST favorise la simplicité, l'extensibilité et l'indépendance entre le client et le serveur.
+An API REST (Representational State Transfer) is an interface that enables different computer systems to communicate with each other in a standardised way via the HTTP protocol. It is based on simple principles, such as the use of URIs to identify resources, the use of HTTP methods (GET, POST, PUT, DELETE) to perform operations on these resources, and the representation of data in common formats such as JSON or XML. The REST approach favours simplicity, extensibility and independence between client and server.
 
-## Créer un nouveau projet Express.js basique :
-Tout d'abord, créez un dossier appelé express_workshop et initialisez npm :
+## Creating a new Hello World project:
+
+### Create a new Express.js project:
+First, create a folder called express_workshop and initialise the node project:
 ```
 mkdir express_workshop 
 cd express_workshop
 npm init -y
 ```
-Ajouter le package express js
+Add the express js package
 ```
 npm install express
 ```
-Ajoutez le paquet Nodemon pour exécuter l'application sans redémarrer le serveur à chaque changement dans le projet.
+Add the Nodemon package to run the application without restarting the server each time the project changes.
 ```
 npm install nodemon
 ```
-Si vous avez node 18 ou plus d'installer vous pouvez utliser le --watch a la place de nodemon
-
-Modifier package.json et ajouter le commande nodemon :
+If you have node 18 or higher installed you can use --watch instead of nodemon:
+```
+node -v
+node --watch server.js
+```
+Modify package.json and add the nodemon or --watch command:
 ```
 "scripts": {
     "start": "nodemon server.js"
 },
 ```
-Ajouter aussi body-parser et cors
+Or
+```
+"scripts": {
+    "start": "node --watch server.js"
+},
+```
+Also add body-parser and corns:
 ```
 npm install body-parser
 npm install cors
 ```
-
-Créer un fichier server.js et importer dedans express ainsi que l'initialisation du serveur :
+Create a server.js file and import express and server initialisation into it:
 ```
 const express = require('express');
 
@@ -45,49 +55,52 @@ const app = express();
 const http = require('http');
 const server = http.createServer(app);
 ```
-Ajoutez le paquet dotenv pour charger les variable d'environement a partir d'un fichier
+Add the dotenv package to load environment variables from a file:
 ```
 npm install dotenv
 ```
-Créer un fichier .env et ajouter dedans le port sur lequel le serveur va tourner :
+Create an .env file and add the port on which the server will run:
 ```
 PORT=5000
 ```
-dans le fichier server.js rajouter l'import de dotenv :
+In the server.js file, add the dotenv import:
 ```
 dotenv.config();
 ```
-Toujour dans le fichier server.js rajouter une constante pour le port du serveur :
+Always add a constant for the server port in the server.js file:
 ```
 const PORT = process.env.PORT || 3000;
 ```
-Ajouter la gestion des cors et le formatage du body :
+Add cors management and body formatting:
 ```
 app.use(cors());
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json())
 app.use(express.json());
 ```
-Il ne manque plus qu'a écouter sur le port indiqué :
+All you have to do is listen on the port indicated:
 ```
 server.listen(PORT, () => {
     console.log(`Server started on port ${PORT}`);
 });
 ```
-Pour lancer le projet il suffit de faire :
+To launch the project, simply do:
 ```
 npm start
 ```
-Si on va sur "localhost:5000", il y a une erreur "Cannot GET /" car aucune requêtes n'a encore été créé.</br>
-Pour rajouter un requête il suffit de faire :
+For this workshop we are using npm but don't hesitate to check [pnpm](https://pnpm.io/fr/) which is an improved version of npm.
+
+If we go to "localhost:5000", we get a "Cannot GET /" error because no requests have yet been created.
+
+To add a request, simply do:
 ```
 app.get("/", (req, res) => {
     res.send("Hello World!");
     console.log("Hello World!");
 });
 ```
-## La structure du projet :
-Voici une bonne structure pour un projet express :
+## The structure of the project :
+Here's a good structure for an express project:
 ```
 src/
 ├── config/ 
@@ -96,43 +109,46 @@ src/
 ├── models/
 ├── dto/
 ├── routes/
+├── services /
 └── sockets/
 └── test/
 ```
+- config/: Contains the application configuration files, such as database configuration, etc.
 
-- config/ : Contient les fichiers de configuration de l'application, tels que la configuration de la base de données, etc.
+- controllers/: Responsible for handling HTTP requests for each API feature. Each file coordinates the flow of data before responding to the client, facilitating modular route management.
 
-- controllers/ : Responsable du traitement des requêtes HTTP pour chaque fonctionnalité de l'API. Chaque fichier coordonne le flux des données avant de répondre au client, facilitant la gestion modulaire des routes.
+- middlewares/ : Middlewares are intermediate functions that can perform actions before or after the main request is processed. They are used to add functionality such as authentication, validation, etc.
 
-- middlewares/ : Les middlewares sont des fonctions intermédiaires qui peuvent effectuer des actions avant ou après le traitement de la requête principale. Ils sont utilisés pour ajouter des fonctionnalités comme l'authentification, la validation, etc.
+- models/ : Models represent the data structure of the application. They are used to interact with the database and define the form of the data.
 
-- models/ : Les modèles représentent la structure des données de l'application. Ils sont utilisés pour interagir avec la base de données et définir la forme des données.
+- dto/ : Data Transfer Objects (DTOs) are used to define the structure of data exchanged between the frontend (client) and the backend (api). This controls the data that enters and leaves the API.
 
-- dto/ : Les objets de transfert de données (DTO) sont utilisés pour définir la structure des données échangées entre le front (client) et backend (api). Cela permet de contrôler les données qui entrent et sortent de l'API.
+- routes/ : The files in this folder define the routes of the API. Each file can represent a set of routes associated with a specific functionality of the application.
 
-- routes/ : Les fichiers dans ce dossier définissent les routes de l'API. Chaque fichier pourrait représenter un ensemble de routes associées à une fonctionnalité spécifique de l'application.
+- services/ : services/: This folder contains the application's services. Services are functions that implement the application's business logic. They are generally used by controllers to perform specific operations.
 
-- sockets/ : Si votre application utilise des WebSockets, ce dossier pourrait contenir la logique liée à la gestion des connexions et des échanges de données en temps réel.
+- sockets/ : If your application uses WebSockets, this folder may contain the logic associated with managing connections and data exchanges in real time.
 
-- test/ : Les tests unitaires, d'intégration.
+- test/: Unit and integration tests.
 
-## Setup d'une base de données Mongodb :
-### Créer un DB mongoDB
-Pour stocker des données il faut connecter un DB a l'api, dans notre cas nous allons utiliser mMngoDB.</br>
-- La façon la plus facile de créer une db Mongo, est dans hébeger une avec un compte gratuit sur [Mongodb Atlas](https://www.mongodb.com/).
-- Créer une nouvelle organisation
-- Une fois un compte créé, créer un nouveau projet.
-- Puis cliquer sur Create a deployment et choisir l'option "M0
-FREE" puis cliquer sur Create.
-- Créer un user et mots de passe
-- Ajouter l'ip "0.0.0.0/0" pour que l'accès a la db ne soit pas restreint.
-### Ajouter Mongo dans le projet
+## Setting up a Mongodb database:
+### Creating a mongoDB DB:
+To store data, you need to connect a DB to the api. In our case, we're going to use a NoSQL database, MongoDB.
+
+- The easiest way to create a Mongo db is to host one with a free account on [Mongodb Atlas](https://www.mongodb.com/).
+- Creating a new organisation
+- Once an account has been created, create a new project.
+- Then click on Create a deployment and choose the "M0
+FREE" then click on Create.
+- Create a user and passwords
+- Add the ip "0.0.0.0/0" so that access to the db is not restricted.
+### Add Mongo to the project
 ```
 npm install mongodb
 ```
-- Allez dans l'onglet Database et cliquer sur connect, Drivers et copier l'url de la db (3. Add your connection string into your application code)
-- Ajouter dans le .env une variable DATABASE_URL avec l'url de la db
-- Ajouter un fichier connection.js dans le dossier config avec le contenue suivant :
+- Go to the Database tab and click on connect, Drivers and copy the url of the db (3. Add your connection string into your application code)
+- Add a DATABASE_URL variable to the .env with the url of the db
+- Add a connection.js file in the config folder with the following content:
 ```
 const mongoose = require('mongoose');
 require('dotenv').config();
@@ -151,11 +167,11 @@ Puis dans index.js a la racine du projet :
 ```
 const connectDB = require('./src/config/connection');
 
-connectDB(); # call la fonction juste avant les app.use
+connectDB(); # call the function just before the app.use
 ```
 
-## Ajout d'une route get :
-Dans le dossier routes créer un fichier index.js et ajouter le code suivant :</br>
+## Add a get route:
+In the routes folder, create an index.js file and add the following code:
 ```
 const express = require('express');
 
@@ -163,23 +179,39 @@ const router = express.Router();
 
 module.exports = router;
 ```
-Dans le server.js a la racine du projet importer le router et ajouter en dessous de la requête get / :
+In the server.js at the root of the project import the router and add below the request get / :
 ```
 app.use('', routes);
 ```
-Ce fichier va contenir touts les routes de projet.</br>
-Nous allons créer une requête get /helloworld
+This file will contain all the project routes.
+
+We're going to create a get /helloworld request:
 ```
 router.get('/helloworld', helloWorldGet);
 ```
-Les différent type de requêtes http
-- get : pour obtenir des information
-- post : pour l'ajoute quelque chose dans la db, avec un objet dans la requête
-- put : pour modifier quelque chose dans la db, avec un objet dans la requête
-- delete : pour supprimer quelque chose dans la db
+The different types of http requests:
+- get: to obtain some information
+- post: to create something in the db, with an object in the request
+- put : to update something in the db, with an object in the request
+- delete : to delete something in the db
 
+Be careful not to capitalise letters in the url of a request!
 
-Créer un fichier hello-world.js dans controllers et ajoute une requête get :
+Bad examples:
+```
+http://api.example.com/v1/store/CreateItems/{item-id}❌
+http://api.example.com/v1/store/getEmployees/{emp-id}❌
+http://api.example.com/v1/store/update-prices/{price-id}❌
+http://api.example.com/v1/store/deleteOrders/{order-id}❌
+```
+Good examples:
+```
+http://api.example.com/v1/store/items/{item-id}✅
+http://api.example.com/v1/store/employees/{emp-id}✅
+http://api.example.com/v1/store/prices/{price-id}✅
+http://api.example.com/v1/store/orders/{order-id}✅
+```
+Create a hello-world.js file in controllers and add a get request:
 
 ```
 const helloWorldGet = async (req, res, next) => {
@@ -195,11 +227,12 @@ module.exports = {
     helloWorldGet
 };
 ```
-Pour tester les requêtes, utiliser Postman
+To test requests, use Postman
 
-## Ajout de l'authentification :
-Pour ajouter l'authentification nous allons rajouter le schéma de l'user.</br>
-Créer un fichier User.js dans le dossier models
+## Add the authentication:
+To add the authentication, we're going to add the user's schema.
+
+Create a User.js file in the models folder:
 ```
 const mongoose = require('mongoose');
 
@@ -223,27 +256,27 @@ const User = mongoose.model('User', userSchema);
 
 module.exports = User;
 ```
-Rajouter le paquet bcrypt pour hasher le mots de pass :
+Add the bcrypt package to hash the passwords:
 ```
 npm i bcrypt
 ```
-Toujours dans le fichier User.js rajouter le code pour hashé le mots de passe et pour comparer une string au mots de passe .
+Still in the User.js file, add the code to hash the password and to compare a string to the password:
 ```
 const bcrypt = require('bcrypt');
 
 userSchema.pre('save', async function (next) {
-  # hashé le mots de passe ici
+  # hash the password here
 });
 
 userSchema.methods.comparePassword = async function (password) {
-  # comparer une string au mots de passe
+  # compare a string with a password
 };
 ```
-Pour gérer le token d'authentification nous allons utiliser jwt
+To manage the authentication token, we're going to use jwt :
 ```
 npm i jwt
 ```
-Nous allons maintenant créer la requête d'authentification, créer un fichier  auth.js dans le dossier controllers/ et compléter le code suivant :
+We're now going to create the authentication request, create an auth.js file in the controllers/ folder and complete the following code:
 ```
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcrypt');
@@ -288,19 +321,17 @@ const logout = async (req, res, next) => {
 
 module.exports = { register, login, logout };
 ```
-N'oublier pas d'importer les requête dans le dossier route.js
+Don't forget to import the requests into the routes folder:
 ```
-
 const { register, login, logout } = require('../controllers/auth');
 
 router.post('/auth/signup', register);
 router.post('/auth/login', login);
 router.post('/auth/logout', logout);
 ```
+Now all that's left to do is to create middleware to manage the authentication token, which will protect certain requests:
 
-Maintenant il ne reste plus qu'a créer un middleware pour la gestion du token d'authentification qui va permettre de protéger certaine requête :
-
-Créer un dans le dossier middlewares auth.js :
+Create an auth.js file in the middlewares folder auth.js :
 ```
 const jwt = require('jsonwebtoken');
 const User = require('../models/User');
@@ -329,26 +360,24 @@ const authenticate = async (req, res, next) => {
 module.exports = { authenticate };
 ```
 
-Pour protéger un requête il suffit de rajouter dans routes/index.js [authenticate] a chaque requête protégé :
+To protect a request, simply add [authenticate] to each protected request in routes/index.js :
 ```
 const { authenticate } = require('../middlewares/auth');
 
 router.get('/helloworld', [authenticate], helloWorldGet);
 ```
+Try creating a profile get request to obtain a user's information
 
-Essayer de créer une requête profile get pour obtenir le information d'un user
-
-Voici un peut d'aide obtenir pour obtenir un user dans le db d'après un id :
+Here is some help on obtaining a user in the db based on an id:
 ```
 const { _id } = req.user;
 ...
 const user = await User.findById(_id);
 ...
-
 ```
-- Essayer de créer une requête supprimer un user
-- Essayer de créer une requête obtenir la listes des user
-- Essayer de créer une requête pour modifier les info d'un user 
-- Rajouter plus d'information dans le schéma de l'user
-- Créer un nouveau schéma pour un système de messages en groupe
+- Try to create a request to delete a user
+- Try to create a request to obtain the list of users
+- Trying to create a request to modify a user's info 
+- Add more information to the user's schema
+- Create a new schema for a group message system
 
